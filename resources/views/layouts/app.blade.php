@@ -23,6 +23,19 @@
                     <ul>
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ route('giocatori.index') }}">Rosa</a></li>
+                        <li><a href="{{ route('classifica') }}">Classifica</a></li>
+                        @guest
+                            <li><a href="{{ route('login') }}">Accedi</a></li>
+                            <li><a href="{{ route('registrazione') }}">Registrati</a></li>
+                        @endguest
+                        @auth
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="form-logout">
+                                    @csrf
+                                    <button type="submit" class="link-logout">Esci ({{ auth()->user()->name }})</button>
+                                </form>
+                            </li>
+                        @endauth
                     </ul>
                 </nav>
             </div>
