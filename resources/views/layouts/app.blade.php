@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('titolo', 'Juventus') - Sito non ufficiale</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
@@ -29,6 +30,7 @@
                             <li><a href="{{ route('registrazione') }}">Registrati</a></li>
                         @endguest
                         @auth
+                            <li><a href="{{ route('preferiti') }}">Preferiti</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="form-logout">
                                     @csrf

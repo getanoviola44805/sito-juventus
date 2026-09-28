@@ -408,6 +408,33 @@ button.bottone {
     font-weight: bold;
 }
 
+/* ===== PREFERITI ===== */
+
+.stella {
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    color: #cccccc;
+    cursor: pointer;
+    margin-left: 12px;
+    margin-top: 12px;
+    vertical-align: middle;
+}
+
+.stella:hover {
+    transform: scale(1.2);
+}
+
+.stella.attiva {
+    color: #d4a017;
+}
+
+#listaPreferiti .card {
+    flex-grow: 0;
+    flex-basis: 340px;
+}
+
 /* ===== VERSIONE MOBILE ===== */
 
 @media (max-width: 768px) {
@@ -471,5 +498,9 @@ button.bottone {
     .classifica th,
     .classifica td {
         padding: 8px 5px;
+    }
+
+    #listaPreferiti .card {
+        flex-basis: 100%;
     }
 }

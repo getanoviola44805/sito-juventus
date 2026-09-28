@@ -24,6 +24,9 @@
                     <p class="card-etichetta">{{ $giocatore->ruolo }}</p>
                     <p class="card-data">{{ $giocatore->nazionalita }}</p>
                     <a href="{{ route('giocatori.show', $giocatore) }}" class="bottone">Scheda</a>
+                    @auth
+                        <button class="stella {{ in_array($giocatore->id, $preferiti) ? 'attiva' : '' }}" data-id="{{ $giocatore->id }}" title="Aggiungi o togli dai preferiti">&#9733;</button>
+                    @endauth
                 </article>
             @endforeach
         </div>

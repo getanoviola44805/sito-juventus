@@ -184,6 +184,68 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // ===== PREFERITI (richieste REST al nostro server) =====
+
+    const listaPreferiti = document.getElementById('listaPreferiti');
+
+    // Pagina "I miei preferiti": carica la lista con una GET asincrona
+    if (listaPreferiti) {
+        fetch('/api/preferiti', {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(function (risposta) {
+                if (!risposta.ok) {
+                    throw new Error('Errore ' + risposta.status);
+                }
+                return risposta.json();
+            })
+            .then(function (giocatori) {
+                listaPreferiti.innerHTML = '';
+
+                if (giocatori.length === 0) {
+                    mostraNessunPreferito();
+                    return;
+                }
+
+                giocatori.forEach(function (g) {
+                    listaPreferiti.appendChild(creaCardPreferito(g));
+                });
+            })
+            .catch(function () {
+                listaPreferiti.innerHTML = '<p class="caricamento">Preferiti non disponibili al momento.</p>';
+            });
+    }
+
+    // Click su una stella (nella Rosa o nei Preferiti): event delegation sul document
+    document.addEventListener('click', function (event) {
+        const stella = event.target.closest('.stella');
+
+        if (!stella) {
+            return;
+        }
+
+        cambiaPreferito(stella.dataset.id)
+            .then(function (dati) {
+                stella.classList.toggle('attiva', dati.preferito);
+
+                // Nella pagina Preferiti, se lo tolgo, la card sparisce
+                if (listaPreferiti && !dati.preferito) {
+                    stella.closest('.card').remove();
+
+                    if (listaPreferiti.children.length === 0) {
+                        mostraNessunPreferito();
+                    }
+                }
+            })
+            .catch(function (errore) {
+                console.error(errore);
+            });
+    });
+
+    function mostraNessunPreferito() {
+        listaPreferiti.innerHTML = '<p class="caricamento">Non hai ancora giocatori preferiti.</p>';
+    }
+
     // ===== FUNZIONI DI SUPPORTO =====
 
     function emailValida(email) {
@@ -228,6 +290,64 @@ document.addEventListener('DOMContentLoaded', function () {
         if (codice <= 82) return 'Rovesci';
         if (codice <= 86) return 'Rovesci di neve';
         return 'Temporale';
+    }
+
+
+    function cambiaPreferito(id) {
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+
+        return fetch('/api/preferiti/' + id, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            }
+        }).then(function (risposta) {
+            if (!risposta.ok) {
+                throw new Error('Errore ' + risposta.status);
+            }
+            return risposta.json();
+        });
+    }
+
+    function creaCardPreferito(g) {
+        const card = document.createElement('article');
+        card.classList.add('card', 'card-giocatore');
+
+        const numero = document.createElement('span');
+        numero.classList.add('numero');
+        numero.textContent = g.numero;
+
+        const nome = document.createElement('h3');
+        nome.textContent = g.nome + ' ' + g.cognome;
+
+        const ruolo = document.createElement('p');
+        ruolo.classList.add('card-etichetta');
+        ruolo.textContent = g.ruolo;
+
+        const nazione = document.createElement('p');
+        nazione.classList.add('card-data');
+        nazione.textContent = g.nazionalita;
+
+        const link = document.createElement('a');
+        link.classList.add('bottone');
+        link.href = '/giocatori/' + g.id;
+        link.textContent = 'Scheda';
+
+        const stella = document.createElement('button');
+        stella.classList.add('stella', 'attiva');
+        stella.dataset.id = g.id;
+        stella.title = 'Togli dai preferiti';
+        stella.textContent = '\u2605';
+
+        card.appendChild(numero);
+        card.appendChild(nome);
+        card.appendChild(ruolo);
+        card.appendChild(nazione);
+        card.appendChild(link);
+        card.appendChild(stella);
+
+        return card;
     }
 
 });
